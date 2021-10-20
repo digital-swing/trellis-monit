@@ -5,8 +5,34 @@ server {
     listen 443 ssl;
 
     server_name {{ monit_httpd_server_name }};
+
+    {% if monit_use_same_ssl_cert_as_site -%}
+
+    {% if wordpress_sites[monit_ssl_cert_ref_site].ssl.client_cert_url is defined -%}
+    ssl_verify_client       on;
+    ssl_client_certificate  {{ nginx_ssl_path }}/client-{{ (wordpress_sites[monit_ssl_cert_ref_site].ssl.client_cert_url | hash('md5'))[:7] }}.crt;
+    {% endif -%}
+
+    {% if wordpress_sites[monit_ssl_cert_ref_site].ssl.provider | default('manual') == 'manual' and wordpress_sites[monit_ssl_cert_ref_site].ssl.cert is defined and wordpress_sites[monit_ssl_cert_ref_site].ssl.key is defined -%}
+    ssl_certificate         {{ nginx_path }}/ssl/{{ wordpress_sites[monit_ssl_cert_ref_site].ssl.cert | basename }};
+    ssl_certificate_key     {{ nginx_path }}/ssl/{{ wordpress_sites[monit_ssl_cert_ref_site].ssl.key | basename }};
+
+    {% elif wordpress_sites[monit_ssl_cert_ref_site].ssl.provider | default('manual') == 'letsencrypt' -%}
+    ssl_certificate         {{ nginx_path }}/ssl/letsencrypt/{{ monit_ssl_cert_ref_site }}-bundled.cert;
+    ssl_certificate_key     {{ nginx_path }}/ssl/letsencrypt/{{ monit_ssl_cert_ref_site }}.key;
+
+    {% elif wordpress_sites[monit_ssl_cert_ref_site].ssl.provider | default('manual') == 'self-signed' -%}
+    ssl_certificate         {{ nginx_path }}/ssl/{{ monit_ssl_cert_ref_site }}.cert;
+    ssl_trusted_certificate {{ nginx_path }}/ssl/{{ monit_ssl_cert_ref_site }}.cert;
+    ssl_certificate_key     {{ nginx_path }}/ssl/{{ monit_ssl_cert_ref_site }}.key;
+
+    {% endif -%}
+
+    {% else %}
     ssl_certificate {{ monit_ssl_directory_name }}/{{ monit_httpd_server_name }}.crt;
     ssl_certificate_key {{ monit_ssl_directory_name }}/{{ monit_httpd_server_name }}.pem;
+
+    {% endif -%}
 
     location {{ monit_httpd_location }} {
         rewrite ^{{ monit_httpd_location }}(.*) /$1 break;

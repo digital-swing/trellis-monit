@@ -1,5 +1,4 @@
 ---
-
 monit_path: /etc/monit
 
 monit_daemon: 120
@@ -36,3 +35,5 @@ monit_httpd_location: /monit/
 monit_configuration_path: monit
 monit_configuration_pattern: "^({{ monit_configuration_path | regex_escape }})/(.*)\\.j2$"
 monit_configuration_cleanup: true
+monit_use_same_ssl_cert_as_site: false
+monit_ssl_cert_ref_site: "{{ wordpress_sites.keys() | first }}"
