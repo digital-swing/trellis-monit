@@ -70,6 +70,9 @@ monit_event_queue_limit: 100
 # Active mail server for alert delivery
 monit_smtp: false
 
+# Encrypt the connection to the mail server (STARTTLS on 587); set to false for a plaintext relay
+monit_smtp_ssl: true
+
 # If you active the mail server, you will need to define the sysadmin email
 # with `monit_smtp_sysadmin_email` variable
 

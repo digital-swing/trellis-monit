@@ -14,6 +14,7 @@ monit_event_queue_file: /var/lib/monit/events
 monit_event_queue_limit: 100
 
 monit_smtp: false
+monit_smtp_ssl: true
 # monit_smtp_host: "mail.bar.baz"
 # monit_smtp_port: "25"
 # monit_smtp_username: "user"

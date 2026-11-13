@@ -19,6 +19,9 @@ set mailserver
     username "{{ monit_smtp_username | default(mail_user) }}"
     password "{{ vault_monit_smtp_password | default(vault_mail_password) }}"
     {% endif -%}
+    {% if monit_smtp_ssl -%}
+    using ssl
+    {% endif -%}
     using hostname "{{ monit_smtp_hostname | default(mail_hostname) }}"
 
 set mail-format { from: {{ monit_smtp_sender_address | default(mail_admin) }} }
